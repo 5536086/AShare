@@ -8,132 +8,99 @@
 ## 安装注意事项
 如果直链作为第三方资源站的引用，需要在资源站的头部加上如下meta
 ```
-<meta name=referrer content=never>
-```
-## 界面演示
-![19.png](https://img.wx-app.vip/buffer/b5aa2aa807c03d0020cb5d067ab0ac0675fc99d5c285e8036d6c0a59ca27dbb8.png)
-
-![9.png](https://img.wx-app.vip/buffer/adf0a11a13d5e8e23af624e22933ab6bc9da6765ab84c83b5c71012ccbbeedbc.png)
-
-![10.png](https://img.wx-app.vip/buffer/69de45184438d7e2b685ac052fd98f3825d1461266912cfb34b2b6654d1c8d60.png)
-
-![11.png](https://img.wx-app.vip/buffer/12f278b849728dd75e694d86e6c7c3a4a3e6925fc82527cb0d8a78c576a99c4f.png)
-
-![12.png](https://img.wx-app.vip/buffer/f0d6091431eb143615c3181bfe15d2c0fef6cf3520d142038a556c339858e8a1.png)
-
-![13.png](https://img.wx-app.vip/buffer/3bed6aea8ce34662224ba7fe065aac76f8a03f9fb426277ba9245e41d6b8cb0b.png)
-
-![14.png](https://img.wx-app.vip/buffer/15ea95f315828c62f1660bd05406e119cdc33541f0bd90ce65b489ffcd146a66.png)
-
-
-## 直链演示
-```
-#请使用手机打开，密码是12345
-
-https://aliyundrive.icu/s/bd960a11-61e1-4ff5-a864-c89aef9286c3
+<meta name="referrer" content="never">
 ```
 
-## 准备工作
+## 全新安装的话，参考下面的过程
 
-1. 装了宝塔的linux服务器一台
-2. 在网页上登录好你的阿里云盘账号
+### 获取阿里云盘的refresh_token，这里需要用移动端的token
 
-### 第一步-获取阿里云盘的refresh_token
-
-```
-#按下f12
-#复制下面的代码，直接到控制台执行
-
-JSON.parse(localStorage.getItem('token')).refresh_token
-
-#出来的结果就是refresh_token
-```
-
-![1.png](https://c8.chat/png/1.png)
-
-
-### 第二步-去你的宝塔新建一个站点
-
-域名设置一个你自己的域名，php版本选择纯静态
-
-![2.png](https://c8.chat/png/2.png)
-
-
-### 第三步-到站点 /usr/local/bin 目录，上传直链程序
-![3.png](https://c8.chat/png/3.png)
+### 更改yum源
 
 ```
-#直链程序下载地址：
-
-#win版本下载地址：
-
-https://one.blob.core.chinacloudapi.cn/video/AShare.exe
+curl --silent --location https://rpm.nodesource.com/setup_14.x | sudo bash -
+```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650183650101/2c896a82af7a05429ea6755185ae6948)
 
 
-#linux版本下载地址：
-
-https://one.blob.core.chinacloudapi.cn/video/AShare
+### 安装nodejs环境
 
 ```
+yum install nodejs -y
+```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650183700744/5b255685fe1c663e897350fa4e0e4ce4)
 
-上传好后设置直链程序的权限
-![4.png](https://c8.chat/png/4.png)
 
-### 第四步-到你服务器的 /usr/lib/systemd/system 目录，新增启动文件
-
-文件名为：AShare.service
-
-文件内容如下：
+### 安装pm2管理器
 
 ```
-[Unit]
-Description=AShare server daemon
-Documentation=no
-After=no
-Wants=no
-
-[Service]
-EnvironmentFile=no
-ExecStart=/usr/local/bin/AShare
-ExecReload=/bin/kill -HUP $MAINPID
-ExecStop=/bin/kill -9 $MAINPID
-KillMode=process
-Restart=on-failure
-RestartSec=1s
-
-[Install]
-WantedBy=multi-user.target
+npm i pm2 -g
 ```
-![5.png](https://c8.chat/png/5.png)
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650183755061/d7cb6e64633cfd755f4f319780ecf19d)
 
-### 第五步-启动服务
-登录终端后执行下面的命令可以启动服务
+
+### 安装git
 
 ```
-systemctl start AShare.service
+yum install git -y
 ```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650183793737/634a083a82af129109aeccb59966c37d)
 
 
-执行下面的名称查看程序的运行端口和初始账号密码
+### 下载源码
+
 ```
-systemctl status AShare.service
+git clone https://github.com/badyun/AShare.git
+```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650183942316/84e6f6ca4c16a76c72af22e43933db6a)
+
+
+### 进入源码目录
+
+```
+cd AShare
 ```
 
-如需停止服务，则执行下面的命令
-```
-systemctl stop AShare.service
-```
-![6.png](https://c8.chat/png/6.png)
+### 安装依赖
 
-如图，可以看到我程序运行的地址和账号密码
+```
+npm i
+```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650183965497/521f9f0398a9c799caa5619d77da774d)
 
-再次进入第二步添加的站点设置页，添加反向代理
+
+### 启动服务
+
+```
+pm2 start app.js --name AShare -i max
+```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650184004802/b51275e76cd04174a5340ca15c56625b)
+
+
+### 添加进程守护和开机启动
+
+```
+pm2 save
+pm2 startup
+```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650184023541/74a9cc43f627b75b6bb5bd1b8a7d1562)
+
+
+### 查看启动日志（默认账户密码）
+
+```
+pm2 log AShare
+```
+![1.png](https://sf1-scmcdn-tos.pstatp.com/obj/ad-tetris-site/file/1650184041026/0e048fc02ead2bc9f157ab966ed9c49b)
+
+
+### 如果要使用443或者80啥的，就自己去设置下反代吧
+
+```
 代理就是就是上图看到的服务运行地址，在我这里就是
 http://127.0.0.1:5201
-![7.png](https://c8.chat/png/7.png)
+```
 
-### 第六步-打开系统，根据上面安装的账号密码登录系统，开始新增阿里云盘账号
+### 最后打开系统，根据上面日志里的账号密码登录系统，开始新增阿里云盘账号
 
 点击新增账号，填入你第一步获取的refresh_token，点击确定即可
-![8.png](https://c8.chat/png/8.png)
-
